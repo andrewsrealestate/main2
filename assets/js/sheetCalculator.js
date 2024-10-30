@@ -16,14 +16,23 @@ async function fetchData() {
     }
 }
 
-// Function to calculate total commission based on fetched data
 function calculateTotalCommission(data) {
-    const tatyanaRecords = data.filter(record => record["Board Name"] === "Tatyana Gavrilyuk");
-    
+    // Filter for rows where "Board Name" (index 0) is "Tatyana Gavrilyuk"
+    const tatyanaRecords = data.filter(record => record[0] === "Tatyana Gavrilyuk");
+
+    console.log("Filtered records:", tatyanaRecords); // Log filtered records
+
+    // Sum "Est Commission" values (index 16), handling non-numeric values
     const totalCommission = tatyanaRecords.reduce((total, record) => {
-        const commission = parseFloat(record["Est Commission"].replace(/[^0-9.-]+/g, "")) || 0;
+        const commissionValue = record[16]; // Index 16 is "Est Commission"
+        console.log(`Commission value before parsing: ${commissionValue}`); // Log commission values
+        const commission = parseFloat(commissionValue.replace(/[^0-9.-]+/g, "")) || 0;
+
+        console.log(`Parsed commission: ${commission}`); // Log parsed commission
         return !isNaN(commission) ? total + commission : total;
     }, 0);
+
+    console.log("Total Commission after calculation:", totalCommission); // Final total
 
     document.getElementById("totalCommissionDisplay").textContent = `$${totalCommission.toFixed(2)}`;
 }
