@@ -9,8 +9,8 @@ async function calculateTotalCommission() {
             return total + commission;
         }, 0);
 
-        // Display result in the HTML
-        document.getElementById("totalCommission").textContent = `$${totalCommission.toFixed(2)}`;
+        // Update the HTML element with the new total commission
+        document.getElementById("totalCommissionDisplay").textContent = `$${totalCommission.toFixed(2)}`;
     } catch (error) {
         console.error("Error fetching or processing data:", error);
     }
