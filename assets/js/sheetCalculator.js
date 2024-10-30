@@ -17,7 +17,15 @@ async function fetchData() {
 }
 
 function calculateTotalCommission(data) {
-    // Filter for rows where "Board Name" (index 0) is "Tatyana Gavrilyuk"
+    console.log("Raw data:", data); // Log the full data array
+
+    data.forEach((record, index) => {
+        console.log(`Record ${index}:`, record); // Log each row
+        console.log("Board Name:", record[0]); // Log the Board Name for each row
+        console.log("Est Commission:", record[16]); // Log the Est Commission for each row
+    });
+
+    // Filter for records where "Board Name" is "Tatyana Gavrilyuk"
     const tatyanaRecords = data.filter(record => record[0] === "Tatyana Gavrilyuk");
 
     console.log("Filtered records:", tatyanaRecords); // Log filtered records
