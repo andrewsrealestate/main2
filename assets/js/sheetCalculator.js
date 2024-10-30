@@ -19,25 +19,27 @@ async function fetchData() {
 function calculateTotalCommission(data) {
     console.log("Raw data:", data); // Log the full data array
 
-    data.forEach((record, index) => {
-        console.log(`Record ${index}:`, record); // Log each row
-        console.log("Board Name:", record[0]); // Log the Board Name for each row
-        console.log("Est Commission:", record[16]); // Log the Est Commission for each row
-    });
-
     // Filter for records where "Board Name" is "Tatyana Gavrilyuk"
     const tatyanaRecords = data.filter(record => record[0] === "Tatyana Gavrilyuk");
-
     console.log("Filtered records:", tatyanaRecords); // Log filtered records
 
-    // Sum "Est Commission" values (index 16), handling non-numeric values
+    // Sum "Est Commission" values (index 16), handling "N/A" and non-numeric values
     const totalCommission = tatyanaRecords.reduce((total, record) => {
-        const commissionValue = record[16]; // Index 16 is "Est Commission"
-        console.log(`Commission value before parsing: ${commissionValue}`); // Log commission values
-        const commission = parseFloat(commissionValue.replace(/[^0-9.-]+/g, "")) || 0;
+        let commissionValue = record[16]; // Index 16 is "Est Commission"
+        console.log(`Commission value before parsing: ${commissionValue}`); // Log each commission value
+
+        // Skip "N/A", null, or undefined values
+        if (commissionValue === "N/A" || commissionValue == null) {
+            return total;
+        }
+
+        // Clean up commissionValue if it's a string, otherwise treat as a number
+        const commission = typeof commissionValue === "string"
+            ? parseFloat(commissionValue.replace(/[^0-9.-]+/g, ""))
+            : commissionValue;
 
         console.log(`Parsed commission: ${commission}`); // Log parsed commission
-        return !isNaN(commission) ? total + commission : total;
+        return total + commission;
     }, 0);
 
     console.log("Total Commission after calculation:", totalCommission); // Final total
