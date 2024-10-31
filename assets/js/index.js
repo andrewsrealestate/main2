@@ -1,73 +1,132 @@
 $(function () {
   "use strict";
 
+  // Function to fetch data and filter by agent
+  async function fetchData(selectedAgent = "All") {
+      const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbzC5rF8Q5Xx7LyJmcwL82M6RR0o1oBHqHKFDB7Gx0HSeWdFUxAMDT17D4ZbGsM6tSAJ/exec";
+
+      try {
+          const response = await fetch(googleAppsScriptUrl);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const data = await response.json();
+
+          // Filter records based on selected agent
+          const filteredData = data.filter(record => {
+              if (selectedAgent === "All") return record[0] !== "Team Projects"; 
+              return record[0] === selectedAgent;
+          });
+
+          // Calculate monthly counts for "Closed" records over the last 12 months
+          const monthlyCounts = getMonthlyCounts(filteredData);
+          updateChart1(monthlyCounts);
+
+      } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+      }
+  }
+
+  // Helper function to calculate monthly counts
+  function getMonthlyCounts(data) {
+      const counts = Array(12).fill(0);
+      const now = new Date();
+      
+      data.forEach(record => {
+          const listName = record[2]; // Assuming "List Name" is at index 2
+          const dateListed = new Date(record[7]); // Assuming "Date Listed" is at index 7
+
+          if (listName === "Closed" && dateListed < now) {
+              const monthDiff = now.getMonth() - dateListed.getMonth() + (12 * (now.getFullYear() - dateListed.getFullYear()));
+              if (monthDiff > 0 && monthDiff <= 12) {
+                  counts[12 - monthDiff]++; // Fill counts from oldest to newest (12 entries)
+              }
+          }
+      });
+
+      return counts;
+  }
 
   // chart 1
 
-  var options = {
-    series: [{
-      name: "Net Sales",
-      data: [4, 10, 25, 12, 25, 18, 40, 22, 7]
-    }],
-    chart: {
-      //width:150,
-      height: 105,
-      type: 'area',
-      sparkline: {
-        enabled: !0
-      },
-      zoom: {
-        enabled: false
-      }
-    },
-    dataLabels: {
-      enabled: false
-    },
-    stroke: {
-      width: 1.7,
-      curve: 'smooth'
-    },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shade: 'dark',
-        gradientToColors: ['#02c27a'],
-        shadeIntensity: 1,
-        type: 'vertical',
-        opacityFrom: 0.5,
-        opacityTo: 0.0,
-        //stops: [0, 100, 100, 100]
-      },
-    },
+ 
 
-    colors: ["#02c27a"],
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: !1
-      },
-      x: {
-        show: !1
-      },
-      y: {
-        title: {
-          formatter: function (e) {
-            return ""
+  // Function to update Chart 1 with dynamic data
+  function updateChart1(monthlyCounts) {
+      const options = {
+          series: [{
+              name: "Net Sales",
+              data: monthlyCounts
+          }],
+          chart: {
+              height: 105,
+              type: 'area',
+              sparkline: {
+                  enabled: !0
+              },
+              zoom: {
+                  enabled: false
+              }
+          },
+          dataLabels: {
+              enabled: false
+          },
+          stroke: {
+              width: 1.7,
+              curve: 'smooth'
+          },
+          fill: {
+              type: 'gradient',
+              gradient: {
+                  shade: 'dark',
+                  gradientToColors: ['#02c27a'],
+                  shadeIntensity: 1,
+                  type: 'vertical',
+                  opacityFrom: 0.5,
+                  opacityTo: 0.0,
+              },
+          },
+          colors: ["#02c27a"],
+          tooltip: {
+              theme: "dark",
+              fixed: {
+                  enabled: !1
+              },
+              x: {
+                  show: !1
+              },
+              y: {
+                  title: {
+                      formatter: function () {
+                          return ""
+                      }
+                  }
+              },
+              marker: {
+                  show: !1
+              }
+          },
+          xaxis: {
+              categories: [...Array(12).keys()].map(i => {
+                  const date = new Date();
+                  date.setMonth(date.getMonth() - 11 + i);
+                  return date.toLocaleString('default', { month: 'short' });
+              })
           }
-        }
-      },
-      marker: {
-        show: !1
-      }
-    },
-    xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-    }
-  };
+      };
 
-  var chart = new ApexCharts(document.querySelector("#chart1"), options);
-  chart.render();
+      // Render chart
+      const chart = new ApexCharts(document.querySelector("#chart1"), options);
+      chart.render();
+  }
 
+  // Event listeners for dropdown menu options
+  document.getElementById("filterBen").addEventListener("click", () => fetchData("Ben Andrews"));
+  document.getElementById("filterTatyana").addEventListener("click", () => fetchData("Tatyana Gavrilyuk"));
+  document.getElementById("filterAll").addEventListener("click", () => fetchData("All"));
+
+  // Initial load for "All" data
+  fetchData("All");
+});
 
 
 
