@@ -1,51 +1,57 @@
 $(function () {
   "use strict";
 
-  // Function to fetch data and filter by agent
-  async function fetchData(selectedAgent = "All") {
-      const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbzC5rF8Q5Xx7LyJmcwL82M6RR0o1oBHqHKFDB7Gx0HSeWdFUxAMDT17D4ZbGsM6tSAJ/exec";
+async function fetchData(selectedAgent = "All") {
+    const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbzC5rF8Q5Xx7LyJmcwL82M6RR0o1oBHqHKFDB7Gx0HSeWdFUxAMDT17D4ZbGsM6tSAJ/exec";
 
-      try {
-          const response = await fetch(googleAppsScriptUrl);
-          if (!response.ok) throw new Error("Network response was not ok");
+    try {
+        const response = await fetch(googleAppsScriptUrl);
+        if (!response.ok) throw new Error("Network response was not ok");
 
-          const data = await response.json();
+        const data = await response.json();
 
-          // Filter records based on selected agent
-          const filteredData = data.filter(record => {
-              if (selectedAgent === "All") return record[0] !== "Team Projects"; 
-              return record[0] === selectedAgent;
-          });
+        // Filter records based on selected agent
+        const filteredData = data.filter(record => {
+            if (selectedAgent === "All") return record[0] !== "Team Projects"; 
+            return record[0] === selectedAgent;
+        });
 
-          // Calculate monthly counts for "Closed" records over the last 12 months
-          const monthlyCounts = getMonthlyCounts(filteredData);
-          updateChart1(monthlyCounts);
+        // Calculate monthly counts and total commission
+        const { monthlyCounts, totalCommission } = getMonthlyCounts(filteredData);
 
-      } catch (error) {
-          console.error("There was a problem with the fetch operation:", error);
-      }
-  }
+        // Update Chart 1 with monthly counts
+        updateChart1(monthlyCounts);
 
-  // Helper function to calculate monthly counts
-  function getMonthlyCounts(data) {
-      const counts = Array(12).fill(0);
-      const now = new Date();
-      
-      data.forEach(record => {
-          const listName = record[2]; // Assuming "List Name" is at index 2
-          const dateListed = new Date(record[7]); // Assuming "Date Listed" is at index 7
+        // Update displayed total commission
+        updateTotalCommissionDisplay(totalCommission);
 
-          if (listName === "Closed" && dateListed < now) {
-              const monthDiff = now.getMonth() - dateListed.getMonth() + (12 * (now.getFullYear() - dateListed.getFullYear()));
-              if (monthDiff > 0 && monthDiff <= 12) {
-                  counts[12 - monthDiff]++; // Fill counts from oldest to newest (12 entries)
-              }
-          }
-      });
+    } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+    }
+}
 
-      return counts;
-  }
+  // Updated getMonthlyCounts to include total commission calculation
+function getMonthlyCounts(data) {
+    const counts = Array(12).fill(0);
+    let totalCommission = 0;
+    const now = new Date();
 
+    data.forEach(record => {
+        const listName = record[2]; // Assuming "List Name" is at index 2
+        const dateListed = new Date(record[7]); // Assuming "Date Listed" is at index 7
+        const estCommission = parseFloat(record[16]) || 0; // Assuming "Est Commission" is at index 16
+
+        if (listName === "Closed" && dateListed < now) {
+            const monthDiff = now.getMonth() - dateListed.getMonth() + (12 * (now.getFullYear() - dateListed.getFullYear()));
+            if (monthDiff > 0 && monthDiff <= 12) {
+                counts[12 - monthDiff]++; // Increment count for the correct month
+                totalCommission += estCommission; // Add commission to total
+            }
+        }
+    });
+
+    return { monthlyCounts: counts, totalCommission };
+}
   // chart 1
 
  
@@ -118,6 +124,13 @@ $(function () {
       const chart = new ApexCharts(document.querySelector("#chart1"), options);
       chart.render();
   }
+
+  function updateTotalCommissionDisplay(totalCommission) {
+    const commissionElement = document.querySelector("#totalCommissionDisplay");
+    if (commissionElement) {
+        commissionElement.textContent = `$${totalCommission.toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
+    }
+}
 
   // Event listeners for dropdown menu options
   document.getElementById("filterBen").addEventListener("click", () => fetchData("Ben Andrews"));
