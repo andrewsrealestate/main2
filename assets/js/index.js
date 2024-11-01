@@ -468,4 +468,4 @@ var options = {
 var chart = new ApexCharts(document.querySelector("#chart5"), options);
 chart.render();
 
-});
+
