@@ -371,7 +371,7 @@ $(function () {
       }
     },
     xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      categories: [cells.H2, cells.I2, cells.J2, cells.K2, cells.L2, cells.M2, cells.N2, cells.O2, cells.P2, cells.Q2, cells.R2, cells.S2],
     }
   };
 
@@ -384,12 +384,12 @@ $(function () {
 
   var options = {
     series: [{
-      name: "Sales",
-      data: [20, 5, 60, 10, 30, 20, 25, 15, 31]
+      name: "Buyers",
+      data: [cells.T3, cells.U3, cells.V3, cells.W3, cells.X3, cells.Y3, cells.Z3, cells.AA3, cells.AB3, cells.AC3, cells.AD3, cells.AE3]
     },
     {
-      name: "Views",
-      data: [17, 10, 45, 15, 25, 15, 40, 10, 24]
+      name: "Sellers",
+      data: [cells.AF3, cells.AG3, cells.AH3, cells.AI3, cells.AJ3, cells.AK3, cells.AL3, cells.AM3, cells.AN3, cells.AO3, cells.AP3, cells.AQ3]
     }],
     chart: {
       //width:150,
@@ -466,7 +466,7 @@ $(function () {
       }
     },
     xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      categories: [cells.H2, cells.I2, cells.J2, cells.K2, cells.L2, cells.M2, cells.N2, cells.O2, cells.P2, cells.Q2, cells.R2, cells.S2],
     }
   };
 
