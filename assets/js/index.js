@@ -3,7 +3,7 @@ $(function () {
 
 
 
-  fetch("YOUR_GOOGLE_APPS_SCRIPT_URL")
+  fetch("https://script.google.com/macros/s/AKfycbzC5rF8Q5Xx7LyJmcwL82M6RR0o1oBHqHKFDB7Gx0HSeWdFUxAMDT17D4ZbGsM6tSAJ/exec")
   .then(response => response.json())
   .then(data => {
     // Define a cell mapping to easily access cells by their reference
