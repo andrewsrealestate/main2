@@ -165,8 +165,13 @@ $(function () {
     };
 
     // Example usage
-    console.log("Data for B3:", cells.B3);
-    console.log("Data for C3:", cells.C3);
+    console.log("Fetched cells data:", cells);
+
+    // Update dynamic text content
+      document.getElementById("data-c3").innerText = cells.C3;
+      document.getElementById("data-d3").innerText = cells.D3;
+      document.getElementById("data-e3").innerText = cells.E3;
+      document.getElementById("data-f3").innerText = cells.F3;
 
     // Use cell data in chart 1
     var options = {
