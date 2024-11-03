@@ -164,6 +164,8 @@ $(function () {
       S2: data[0][17],
     };
 
+    document.getElementById("data-c3").innerText = cells.C3 || "N/A"; // Fallback if C3 is undefined
+
     // Example usage
     console.log("Fetched cells data:", cells);
 
